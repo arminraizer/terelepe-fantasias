@@ -92,7 +92,7 @@
         const WHATSAPP = "5511963267337"; // <--- COLOQUE SEU NÚMERO AQUI
         // ... (mantenha o restante do código igual)
 
-const MERCADO_PAGO_LIVRE = "link.mercadopago.com.br/terelepefantasias"; 
+const MERCADO_PAGO_LIVRE = "https://link.mercadopago.com.br/terelepefantasias"; 
 
 function finalizarMercadoPago() {
     if (carrinho.length === 0) return alert("Seu carrinho está vazio!");
@@ -105,7 +105,7 @@ function finalizarMercadoPago() {
     alert("O total do seu pedido é R$ " + total.toFixed(2) + ".\n\nNa próxima página, informe este valor no campo 'Preço' para concluir o pagamento.");
 
     // Abre o link onde o cliente digita o valor
-    window.location.href = MERCADO_PAGO_LIVRE;
+    window.location.href = MERCADO_PAGO_LIVRE = LINK_MERCADO_PAGO;
 }
 
 // ... (mantenha o restante do código igual)
@@ -222,18 +222,15 @@ function finalizarMercadoPago() {
             { id: 107, nome: "Alemã Vinho", tamanho: "M", aluguel: 500, venda: 1200, categoria: "Traje Alemão", foto: "fotos/alemavinho.png.png" , desc:"Fantasia da Alemã Vinho clássica ideal para eventos temáticos e festas à fantasia." },
             { id: 108, nome: "Alemão Oktoberfest", tamanho: "M", aluguel: 500, venda: 1200, categoria: "Traje Alemão", foto: "fotos/trajealemao.png (2).png" , desc:"Fantasia do Alemão Oktoberfest clássica ideal para eventos temáticos e festas à fantasia." },
             { id: 109, nome: "Coelho da Páscoa", tamanho: "G", aluguel: 500, venda: 1200, categoria: "Páscoa", foto: "fotos/pascoa.png.png" , desc:"Fantasia do Coelho da Páscoa clássica ideal para eventos temáticos e festas à fantasia." },
-            { id: 110, nome: "Tiara Romana", tamanho: "único", aluguel: 50, venda: 120, categoria: "Acessórios", foto:"fotos/tiara.png" , desc:"Fantasia da Tiara Romana clássica ideal para eventos temáticos e festas à fantasia." },
-            { id :111 , nome :"Tiara Romana/Grega" , tamanho :"único" , aluguel :50 , venda :120 , categoria :"Acessórios" , foto :"fotos/tiara.png" , desc :"Fantasia da tiara romana/grega clássica ideal para eventos temáticos e festas à fantasia." },
-            { id :112 , nome :"Tiara Romana/Grega" , tamanho :"único" , aluguel :500 , venda :1200 , categoria :"Acessórios" , foto :"fotos/acessoromano.png.png" , desc :"Fantasia da tiara romana/grega clássica ideal para eventos temáticos e festas à fantasia." },
-            { id :113 , nome :"Orelhas Elfo/Elfa" , tamanho :"único" , aluguel :500 , venda :1200 , categoria :"Acessórios" , foto :"fotos/elfoelfa.png.png" , desc :"Fantasia das orelhas elfo/elfa clássica ideal para eventos temáticos e festas à fantasia." },
+            { id :111, nome :"Tiara Romana/Grega" , tamanho :"único" , aluguel :50 , venda :120 , categoria :"Acessórios" , foto :"terelepe-fantasias/fotos/acessoromano.png.png" , desc :"Tiara romana/grega clássica ideal para eventos temáticos e festas à fantasia." },
+            { id :113, nome:"Orelhas Elfo/Elfa" , tamanho :"único" , aluguel :500 , venda :1200 , categoria :"Acessórios" , foto :"fotos/elfoelfa.png.png" , desc :"Fantasia das orelhas elfo/elfa clássica ideal para eventos temáticos e festas à fantasia." },
             { id: 114, nome: "Coroa de Princesa", tamanho: "único", aluguel: 500, venda: 1200, categoria: "Acessórios", foto: "fotos/coroaprincesa.png.png" , desc:"Fantasia da coroa de princesa clássica ideal para eventos temáticos e festas à fantasia." },
             { id: 115, nome: "Cartola", tamanho: "único", aluguel: 500, venda: 1200, categoria:"Acessórios" , foto :"fotos/cartola.png.jpeg" , desc :"Fantasia da cartola clássica ideal para eventos temáticos e festas à fantasia." },
             { id: 116, nome: "Chapéu Cowboy", tamanho: "único", aluguel: 500, venda: 1200, categoria: "Acessórios", foto: "fotos/cowboy.png.jpeg" , desc:"Fantasia do chapéu cowboy clássico ideal para eventos temáticos e festas à fantasia." },
             { id: 117, nome: "Chapéu Xerife do Velho Oeste", tamanho: "único", aluguel: 500, venda: 1200, categoria: "Acessórios", foto: "fotos/xerife.png.jpeg" , desc:"Fantasia do chapéu xerife do velho oeste clássico ideal para eventos temáticos e festas à fantasia." },
-            { id: 118, nome: "Coroa de Louros", tamanho: "único", aluguel: 500, venda: 1200, categoria: "Acessórios", foto: "fotos/coroalouros.png.jpeg" , desc:"Fantasia da coroa de louros clássica ideal para eventos temáticos e festas à fantasia." },
-            { id: 119, nome: "Chifres de diaba", tamanho: "único", aluguel: 500, venda: 1200, categoria: "Acessórios", foto: "fotos/coroadiaba.png.png" , desc:"Fantasia dos chifres de diaba clássica ideal para eventos temáticos e festas à fantasia." },
-            { id: 120, nome: "Chapéu Bobo da Corte", tamanho: "único", aluguel: 500, venda: 1200, categoria: "Acessórios", foto: "fotos/bobodacorte.png.png" , desc:"Fantasia do chapéu bobo da corte clássico ideal para eventos temáticos e festas à fantasia." },
-            { id: 121, nome: "Tiara Egípcia", tamanho: "único", aluguel: 500, venda: 1200, categoria:"Acessórios" , foto :"fotos/tiaraegipcia.png.png" , desc :"Fantasia da tiara egípcia clássica ideal para eventos temáticos e festas à fantasia." }
+            { id: 118, nome: "Coroa de Louros", tamanho: "único", aluguel: 500, venda: 1200, categoria: "Acessórios", foto: "terelepe-fantasias/fotos/coroalouros.png.jpeg" , desc:"Fantasia da coroa de louros clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 119, nome: "Chifres de diaba", tamanho: "único", aluguel: 500, venda: 1200, categoria: "Acessórios", foto: "terelepe-fantasias/fotos/coroadiaba.png.png" , desc:"Fantasia dos chifres de diaba clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 120, nome: "Chapéu Bobo da Corte", tamanho: "único", aluguel: 500, venda: 1200, categoria: "Acessórios", foto: "terelepe-fantasias/fotos/bobodacorte.png.png" , desc:"Fantasia do chapéu bobo da corte clássico ideal para eventos temáticos e festas à fantasia." },
         ];
 
         let carrinho = JSON.parse(localStorage.getItem('carrinho_terelepe')) || [];
