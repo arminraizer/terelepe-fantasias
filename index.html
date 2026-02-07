@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terelepe Fantasias - Loja Oficial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --roxo-terelepe: #7B3FE4; --azul-terelepe: #0A3B8B; }
+        body { font-family: 'Fredoka', sans-serif; background-color: #f5f0ff; position: relative; }
+        .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('fotos/logo.png.jpeg'); background-repeat: repeat; background-size: 120px; opacity: 0.05; z-index: -1; pointer-events: none; }
+        .titulo-contornado { font-weight: 700; color: white; text-transform: uppercase; text-shadow: -2px -2px 0 var(--azul-terelepe), 2px -2px 0 var(--azul-terelepe), -2px 2px 0 var(--azul-terelepe), 2px 2px 0 var(--azul-terelepe), 4px 4px 0px rgba(0,0,0,0.1); line-height: 0.9; }
+        .btn-filtro { padding: 0.6rem 1.5rem; border-radius: 9999px; font-weight: 700; border: 2px solid var(--roxo-terelepe); color: var(--roxo-terelepe); background: white; transition: all 0.3s ease; white-space: nowrap; }
+        .btn-filtro.active { background-color: var(--roxo-terelepe); color: white; box-shadow: 0 4px 15px rgba(123, 63, 228, 0.4); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        #painel-carrinho, #modal-detalhes { transition: all 0.3s ease-in-out; }
+        .card-fantasia { backdrop-filter: blur(5px); background: rgba(255, 255, 255, 0.9); }
+    </style>
+</head>
+<body>
+
+    <div class="bg-pattern"></div>
+
+    <nav class="p-4 md:p-6 text-white shadow-xl sticky top-0 z-50" style="background-color: var(--roxo-terelepe);">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3 md:gap-6">
+                <img src="fotos/logo.png.jpeg" alt="Logo" class="h-16 md:h-24 w-auto drop-shadow-lg" onerror="this.src='https://placehold.co/100x100?text=Logo'"> 
+                <h1 class="titulo-contornado text-2xl md:text-4xl">Terelepe<br><span class="text-sm md:text-xl">Fantasias</span></h1>
+            </div>
+            <button onclick="toggleCarrinho()" class="bg-white text-purple-700 p-3 md:px-8 md:py-3 rounded-full font-bold shadow-lg hover:scale-105 transition flex items-center gap-2">
+                <span class="text-xl md:text-2xl">🛒</span>
+                <span id="contagem-carrinho" class="bg-purple-600 text-white rounded-full px-2 md:px-3 py-1 text-xs md:sm">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="bg-white/90 backdrop-blur-md sticky top-[80px] md:top-[112px] z-40 border-b">
+        <div class="container mx-auto p-4 flex gap-3 overflow-x-auto justify-start md:justify-center no-scrollbar">
+            <button onclick="filtrar('Todas', this)" class="btn-filtro active">Todas</button>
+            <button onclick="filtrar('Princesas', this)" class="btn-filtro">Princesas</button>
+            <button onclick="filtrar('Clássicas', this)" class="btn-filtro">Clássicas</button>
+            <button onclick="filtrar('Natal', this)" class="btn-filtro">Natal</button>
+            <button onclick="filtrar('Páscoa', this)" class="btn-filtro">Páscoa</button>
+            <button onclick="filtrar('Halloween', this)" class="btn-filtro">Halloween</button>
+            <button onclick="filtrar('Acessórios', this)" class="btn-filtro">Acessórios</button>
+            <button onclick="filtrar('Infantil', this)" class="btn-filtro">Infantil</button>
+            <button onclick="filtrar('Traje Alemão', this)" class="btn-filtro">Traje Alemão</button>
+        </div>
+    </div>
+
+    <div class="container mx-auto p-4 md:p-8">
+        <div id="lista-fantasias" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10"></div>
+    </div>
+
+    <div id="modal-detalhes" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-[2.5rem] max-w-2xl w-full max-h-[90vh] overflow-y-auto relative p-6 md:p-10 shadow-2xl">
+            <button onclick="fecharModal()" class="absolute top-5 right-5 text-3xl font-bold text-gray-400 hover:text-gray-800">&times;</button>
+            <div id="conteudo-modal" class="flex flex-col md:flex-row gap-8"></div>
+        </div>
+    </div>
+
+    <div id="painel-carrinho" class="fixed right-0 top-0 h-full w-full md:w-96 bg-white shadow-2xl z-[80] transform translate-x-full p-8 overflow-y-auto">
+        <div class="flex justify-between items-center mb-8 border-b pb-4">
+            <h2 class="text-2xl font-bold" style="color: var(--azul-terelepe);">Meu Carrinho</h2>
+            <button onclick="toggleCarrinho()" class="text-4xl">&times;</button>
+        </div>
+        <div id="itens-carrinho" class="space-y-4 mb-8"></div>
+        <div class="border-t pt-6">
+            <div class="flex justify-between text-2xl font-bold mb-6">
+                <span>Total:</span>
+                <span id="total-carrinho">R$ 0,00</span>
+            </div>
+            
+            <div class="flex flex-col gap-3">
+                <button onclick="finalizarWhatsApp()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-2xl shadow-lg transition flex items-center justify-center gap-2">
+                    <span>Finalizar via WhatsApp</span>
+                </button>
+                
+                <button onclick="finalizarMercadoPago()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg transition flex items-center justify-center gap-2">
+                    <img src="https://img.icons8.com/color/48/000000/mercado-pago.png" class="h-6 bg-white rounded-full">
+                    <span>Pagar com Mercado Pago</span>
+                </button>
+            </div>
+            <p class="text-center text-[10px] text-gray-400 mt-4 italic">Confirmamos a disponibilidade da data no WhatsApp.</p>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURAÇÕES GERAIS
+        const WHATSAPP = "5511963267337"; // <--- COLOQUE SEU NÚMERO AQUI
+        // ... (mantenha o restante do código igual)
+
+const MERCADO_PAGO_LIVRE = "link.mercadopago.com.br/terelepefantasias"; 
+
+function finalizarMercadoPago() {
+    if (carrinho.length === 0) return alert("Seu carrinho está vazio!");
+
+    // Calcula o total para avisar o cliente antes de ele sair do site
+    let total = 0;
+    carrinho.forEach(i => total += i.precoFinal);
+
+    // Alerta amigável para o cliente não esquecer o valor
+    alert("O total do seu pedido é R$ " + total.toFixed(2) + ".\n\nNa próxima página, informe este valor no campo 'Preço' para concluir o pagamento.");
+
+    // Abre o link onde o cliente digita o valor
+    window.location.href = MERCADO_PAGO_LIVRE;
+}
+
+// ... (mantenha o restante do código igual)
+        const VALOR_PADRAO_ALUGUEL = 160;
+        const VALOR_PADRAO_VENDA = 250;
+
+        // BANCO DE DADOS (110 FANTASIAS)
+        const minhasFantasias = [
+            { id: 1, nome: "Chapeuzinho Vermelho", tamanho: "M", categoria: "Clássicas", foto: "fotos/chapauzinhovermelho.png.png" , desc:"Fantasia do Chapeuzinho Vermelho clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 2, nome: "Branca de Neve", tamanho: "G", categoria: "Princesas", foto: "fotos/brancadeneve.png.png" , desc:"Fantasia da Branca de Neve clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 3, nome: "It: A Coisa", tamanho: "G", categoria: "Halloween", foto: "fotos/itacoisa.png.png" , desc:"Fantasia do It: A Coisa clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 4, nome: "Arlequina", tamanho: "P", categoria: "Halloween", foto: "fotos/arlequina.png.png" , desc:"Fantasia da Arlequina clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 5, nome: "Chaves", tamanho: "M", categoria: "Clássicas", foto: "fotos/chaves.png.png" , desc:"Fantasia do Chaves clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 6, nome: "Freddy Krueger", tamanho: "G", categoria: "Halloween", foto: "fotos/freddy.png.png" , desc:"Fantasia do Freddy Krueger clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 7, nome: "A Morte", tamanho: "G", categoria: "Halloween", foto: "fotos/amorte.png.png" , desc:"Fantasia da Morte clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 8, nome: "Jason Voorhees", tamanho: "G", categoria: "Halloween", foto: "fotos/jason.png.png" , desc:"Fantasia do Jason Voorhees clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 9, nome: "Chucky", tamanho: "G", categoria: "Halloween", foto: "fotos/chucky.png.png" , desc:"Fantasia do Chucky clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 10, nome: "Diabinha", tamanho: "M", categoria: "Halloween", foto: "fotos/diabinha.png.png" , desc:"Fantasia da Diabinha clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 11, nome: "Coelhinha", tamanho: "P", categoria: "Clássicas", foto: "fotos/coelhinha.png.png" , desc:"Fantasia da Coelhinha clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 12, nome: "Coringa", tamanho: "G", categoria: "Halloween", foto: "fotos/coringa.png.png" , desc:"Fantasia do Coringa clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 13, nome: "Coringa Vermelho", tamanho: "M", categoria: "Halloween", foto: "fotos/coringavermelho.png.png" , desc:"Fantasia do Coringa Vermelho clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 14, nome: "Drácula", tamanho: "M", categoria: "Halloween", foto: "fotos/dracula.png.png" , desc:"Fantasia do Drácula clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 15, nome: "Sininho", tamanho: "100 cm", categoria: "Infantil", foto: "fotos/sininho.png.png" , desc:"Fantasia do Sininho clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 16, nome: "Deus Romano", tamanho: "G", categoria: "Halloween", foto: "fotos/deusromano.png.png" , desc:"Fantasia do Deus Romano clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 17, nome: "Jogos Mortais", tamanho: "M", categoria: "Halloween", foto: "fotos/jogosmortais.png.png" , desc:"Fantasia dos Jogos Mortais clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 18, nome: "It Feminino", tamanho: "G", categoria: "Halloween", foto: "fotos/itacoisafeminino.png.png" , desc:"Fantasia do It Feminino clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 19, nome: "Elsa", tamanho: "130 cm", categoria: "Infantil", foto: "fotos/elsa.png.png" , desc:"Fantasia da Elsa clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 20, nome: "Don Juan", tamanho: "G", categoria: "Clássicas", foto: "fotos/donjuan.png.png" , desc:"Fantasia do Don Juan clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 21, nome: "Prisioneiro", tamanho: "M,G", categoria: "Halloween", foto: "fotos/prisioneiro.png.png" , desc:"Fantasia do Prisioneiro clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 22, nome: "Esqueleto", tamanho: "G", categoria: "Halloween", foto: "fotos/esqueleto.png.png" , desc:"Fantasia do Esqueleto clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 23, nome: "Fred Flinstones", tamanho: "G", categoria: "Halloween", foto: "fotos/flisntones.png.png" , desc:"Fantasia do Fred Flinstones clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 24, nome: "Espanhola", tamanho: "M", categoria: "Clássicas", foto: "fotos/espanhola.png.png" , desc:"Fantasia da Espanhola clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 25, nome: "Bruxa", tamanho: "M", categoria: "Halloween", foto: "fotos/bruxinha.png.png" , desc:"Fantasia da Bruxa clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 26, nome: "Policial", tamanho: "G", categoria: "Halloween", foto: "fotos/policial.png.png" , desc:"Fantasia do Policial clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 27, nome: "Cleópatra Luxo", tamanho: "M", categoria: "Clássicas", foto: "fotos/cleoprataluxo.png.png" , desc:"Fantasia da Cleópatra Luxo clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 28, nome: "Vampira Luxo", tamanho: "M", categoria: "Halloween", foto: "fotos/vampiraluxo.png.png" , desc:"Fantasia da Vampira Luxo clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 29, nome: "Mulher Gato", tamanho: "P", categoria: "Halloween", foto: "fotos/mulhergato.png.png" , desc:"Fantasia da Mulher Gato clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 30, nome: "Harry Potter", tamanho: "G", categoria: "Halloween", foto: "fotos/harrypotter.png.png" , desc:"Fantasia do Harry Potter clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 31, nome: "Kiko", tamanho: "G", categoria: "Clássicas", foto: "fotos/kiko.png.png" , desc:"Fantasia do Kiko clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 32, nome: "La Casa de Papel", tamanho: "P,M,G", categoria: "Halloween", foto: "fotos/lacasadepapel.png.png" , desc:"Fantasia da La Casa de Papel clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 33, nome: "Princesa Aurora", tamanho: "M", categoria: "Princesas", foto: "fotos/aurora.png.png" , desc:"Fantasia da Princesa Aurora clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 34, nome: "Luigi", tamanho: "G", categoria: "Clássicas", foto: "fotos/luigi.png.png" , desc:"Fantasia do Luigi clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 35, nome: "Maria", tamanho: "M", categoria: "Clássicas", foto: "fotos/maria.png.png" , desc:"Fantasia da Maria clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 36, nome: "Princípe Hans", tamanho: "M", categoria: "Halloween", foto: "fotos/princhans.png.png" , desc:"Fantasia do Princípe Hans clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 37, nome: "Myke Myers", tamanho: "M", categoria: "Halloween", foto: "fotos/myke.png.png" , desc:"Fantasia do Myke Myers clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 38, nome: "Mago", tamanho: "G", categoria: "Clássicas", foto: "fotos/mago.png.png" , desc:"Fantasia do Mago clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 39, nome: "Mamãe Noel", tamanho: "M", categoria: "Natal", foto: "fotos/mamaenoel.png.png" , desc:"Fantasia da Mamãe Noel clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 40, nome: "Boneca Round 6", tamanho: "G", categoria: "Halloween", foto: "fotos/bonecaround6.png.png" , desc:"Fantasia da Boneca Round 6 clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 41, nome: "Rainha de Copas", tamanho: "M", categoria: "Halloween", foto: "fotos/rainhadecopas.png.png" , desc:"Fantasia da Rainha de Copas clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 42, nome: "Rei", tamanho: "G", categoria: "Clássicas", foto: "fotos/rei.png.png" , desc:"Fantasia do Rei clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 43, nome: "Peter Pan", tamanho: "M", categoria: "Clássicas", foto: "fotos/peterpan.png.png" , desc:"Fantasia do Peter Pan clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 44, nome: "Mario Bross", tamanho: "G", categoria: "Clássicas", foto: "fotos/mariobross.png.png" , desc:"Fantasia do Mario Bross clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 45, nome: "Mickey", tamanho: "M", categoria: "Clássicas", foto: "fotos/mickey.png.png" , desc:"Fantasia do Mickey clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 46, nome: "Mosqueteiro", tamanho: "M", categoria: "Halloween", foto: "fotos/mosqueteiro.png.png" , desc:"Fantasia do Mosqueteiro clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 47, nome: "Mosqueteiro Azul", tamanho: "M", categoria: "Halloween", foto: "fotos/mosqueteiroazul.png.png" , desc:"Fantasia do Mosqueteiro Azul clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 48, nome: "Papai Noel", tamanho: "G", categoria: "Natal", foto: "fotos/papainoel.png.png" , desc:"Fantasia do Papai Noel clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 49, nome: "Papai Noel Infantil", tamanho: "P", categoria: "Natal", foto: "fotos/papainoelinfantil.png.png" , desc:"Fantasia do Papai Noel Infantil clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 50, nome: "Pirata Listrado", tamanho: "G", categoria: "Halloween", foto: "fotos/pirata.png.png" , desc:"Fantasia do Pirata Listrado clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 51, nome: "Pirata Luxo", tamanho: "M", categoria: "Halloween", foto: "fotos/piratasobretudo.png.png" , desc:"Fantasia do Pirata Luxo clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 52, nome: "Pirata Clássica", tamanho: "M", categoria: "Halloween", foto: "fotos/pirataclassica.png.png" , desc:"Fantasia do Pirata Clássica clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 53, nome: "Pirata Caveira", tamanho: "M", categoria: "Halloween", foto: "fotos/piratacaveira.png.png" , desc:"Fantasia do Pirata Caveira clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 54, nome: "O Pirata", tamanho: "G", categoria: "Halloween", foto: "fotos/opirata.png.png" , desc:"Fantasia do O Pirata clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 55, nome: "Pirata", tamanho: "G", categoria: "Halloween", foto: "fotos/pirata1.png.png" , desc:"Fantasia do Pirata clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 56, nome: "Sheik Árabe", tamanho: "G", categoria: "Halloween", foto: "fotos/sheik.png.png" , desc:"Fantasia da Sheik Árabe clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 57, nome: "Toureiro", tamanho: "M", categoria: "Halloween", foto: "fotos/toureiro.png.png" , desc:"Fantasia do Toureiro clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 58, nome: "Vampiro Luxo", tamanho: "G", categoria: "Halloween", foto: "fotos/vampiroroxo.png.png" , desc:"Fantasia do Vampiro Luxo clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 59, nome: "Zorro", tamanho: "M", categoria: "Halloween", foto: "fotos/zorro.png.png" , desc:"Fantasia do Zorro clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 60, nome: "Príncipe", tamanho: "M", categoria: "Clássicas", foto: "fotos/principe.png.png" , desc:"Fantasia do Príncipe clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 61, nome: "Duende Infantil Luxo", tamanho: "150 cm", categoria: "Natal", foto: "fotos/duende.png.png" , desc:"Fantasia do Duende Infantil Luxo clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 62, nome: "Mortícia", tamanho: "M", categoria: "Halloween", foto: "fotos/morticia.png.png" , desc:"Fantasia da Mortícia clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 63, nome: "Wandinha", tamanho: "M", categoria: "Halloween", foto: "fotos/wandinha.png.png" , desc:"Fantasia da Wandinha clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 64, nome: "Gomez Addams", tamanho: "M", categoria: "Halloween", foto: "fotos/gomez.png.png" , desc:"Fantasia do Gomez Addams clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 65, nome: "Vampira Luxo", tamanho: "M", categoria: "Halloween", foto: "fotos/vampiralu.png.png" , desc:"Fantasia da Vampira Luxo clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 66, nome: "Freddy Krueger Feminino", tamanho: "M", categoria: "Halloween", foto: "fotos/freddyfeminino.png.png" , desc:"Fantasia do Freddy Krueger Feminino clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 67, nome: "Alice", tamanho: "P", categoria: "Clássicas", foto: "fotos/alice.png.png" , desc:"Fantasia da Alice clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 68, nome: "Alice", tamanho: "M", categoria: "Clássicas", foto: "fotos/alice1.png.png" , desc:"Fantasia da Alice clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 69, nome: "Alice Gorda", tamanho: "G", categoria: "Clássicas", foto: "fotos/alice2.png.png" , desc:"Fantasia da Alice Gorda clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 70, nome: "Arlequina", tamanho: "M", categoria: "Halloween", foto: "fotos/arlequina.png (2).png" , desc:"Fantasia da Arlequina clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 71, nome: "Princesa Peach", tamanho: "M", categoria: "Princesas", foto: "fotos/peach.png.png" , desc:"Fantasia da Princesa Peach clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 72, nome: "Ravena", tamanho: "M", categoria: "Halloween", foto: "fotos/ravena.png.png" , desc:"Fantasia da Ravena clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 73, nome: "Líder de Torcida", tamanho: "M", categoria: "Clássicas", foto: "fotos/liderdetorcida.png.png" , desc:"Fantasia do Líder de Torcida clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 74, nome: "Feiticeira", tamanho: "P", categoria: "Halloween", foto: "fotos/feiticeira.png.png" , desc:"Fantasia da Feiticeira clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 75, nome: "Branca de Neve", tamanho: "P", categoria: "Princesas", foto: "fotos/brancadeneve.png (2).png" , desc:"Fantasia da Branca de Neve clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 76, nome: "Pirata Vestido", tamanho: "M", categoria: "Halloween", foto: "fotos/pirataolho.png.png" , desc:"Fantasia do Pirata Vestido clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 77, nome: "Pirata Masculino", tamanho: "G", categoria: "Halloween", foto: "fotos/piratabranco.png.png" , desc:"Fantasia do Pirata Masculino clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 78, nome: "Lobo", tamanho: "G", categoria: "Halloween", foto: "fotos/lobo.png.png" , desc:"Fantasia do Lobo clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 79, nome: "A Pirata Luxo", tamanho: "M", categoria: "Halloween", foto: "fotos/apirataluxo.png.png" , desc:"Fantasia da A Pirata Luxo clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 80, nome: "Bruxa", tamanho: "M", categoria: "Halloween", foto: "fotos/bruxaa.png.png" , desc:"Fantasia da Bruxa clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 81, nome: "Bruxa Longa", tamanho: "G", categoria: "Halloween", foto: "fotos/bruxalonga.png.png" , desc:"Fantasia da Bruxa Longa clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 82, nome: "Bruxa Luxo", tamanho: "M", categoria: "Halloween", foto: "fotos/bruxaluxoo.png.png" , desc:"Fantasia da Bruxa Luxo clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 83, nome: "Mamãe e Papai Noel", tamanho: "M/G", aluguel: 200, venda: 390, categoria: "Natal", foto: "fotos/conjuntonatal.png" , desc:"Fantasia do Mamãe e Papai Noel clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 84, nome: "Spider Queen", tamanho: "M", aluguel: 200, venda: 380, categoria: "Halloween", foto: "fotos/spiderqueen.png.png" , desc:"Fantasia da Spider Queen clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 85, nome: "Mulher Aranha", tamanho: "P", aluguel: 200, venda: 400, categoria: "Halloween", foto: "fotos/mulheraranha.png.png" , desc:"Fantasia da Mulher Aranha clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 86, nome: "Viúva Negra", tamanho: "P", aluguel: 200, venda: 410, categoria: "Halloween", foto: "fotos/viuvanegra.png.png" , desc:"Fantasia da Viúva Negra clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 87, nome: "Melindrosa Amarela", tamanho: "M", aluguel: 200, venda: 420, categoria: "Clássicas", foto: "fotos/melindrosaamarela.png.png" , desc:"Fantasia da Melindrosa Amarela clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 88, nome: "Melindrosa Preta/Dourada", tamanho: "PP", aluguel: 200, venda: 400, categoria: "Clássicas", foto:"fotos/melipretadourada.png.png" , desc:"Fantasia da Melindrosa Preta/Dourada clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 89, nome:"Melindrosa Preta", tamanho:"P", aluguel :200 , venda :410 , categoria:"Clássicas" , foto:"fotos/melindrosapreta.png.png" , desc:"Fantasia da Melindrosa Preta clássica ideal para eventos temáticos e festas à fantasia." },
+            { id :90 , nome :"Melindrosa Vermelha" , tamanho :"M" , aluguel :200 , venda :420 , categoria :"Clássicas" , foto :"fotos/melivermelha.png.png", desc:"Fantasia da Melindrosa Vermelha clássica ideal para eventos temáticos e festas à fantasia." },
+            { id :91 , nome :"Animal Print Listrado" , tamanho :"M" , aluguel :200 , venda :400 , categoria :"Clássicas" , foto :"fotos/animalprintlsitrado.png.png", desc:"Fantasia do Animal Print Listrado clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 92, nome: "Animal Print Onça", tamanho: "M", aluguel: 200, venda: 410, categoria: "Clássicas", foto: "fotos/animalprintonca.png.png" , desc:"Fantasia do Animal Print Onça clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 93, nome: "A Mágica", tamanho: "M", aluguel: 200, venda: 420, categoria: "Clássicas", foto: "fotos/amagica.png.png" , desc:"Fantasia da A Mágica clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 94, nome: "Discípulo Bíblico", tamanho: "G", aluguel: 200, venda: 400, categoria: "Clássicas", foto: "fotos/discipulo.png.png" , desc:"Fantasia do Discípulo Bíblico clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 95, nome: "Dominatrix", tamanho: "M", aluguel: 200, venda: 410, categoria: "Clássicas", foto: "fotos/dominatrix.png.png" , desc:"Fantasia da Dominatrix clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 96, nome: "Peppa Pig", tamanho: "G", aluguel: 200, venda: 420, categoria: "Clássicas", foto: "fotos/peppapig.png.png" , desc:"Fantasia do Peppa Pig clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 97, nome: "Conjunto Telletubies", tamanho: "G", aluguel: 500, venda: 1200, categoria: "Clássicas", foto: "fotos/conjuntotele.png.png" , desc:"Fantasia do Conjunto Telletubies clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 99, nome: "Frajola", tamanho: "M", aluguel: 500, venda: 1200, categoria: "Clássicas", foto: "fotos/frajola.png.jpeg" , desc:"Fantasia da Frajola clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 100, nome: "Stitch", tamanho: "M", aluguel: 500, venda: 1200, categoria: "Clássicas", foto: "fotos/stitch.png.png" , desc:"Fantasia do Stitch clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 101, nome: "Alemão Clássico", tamanho: "M", aluguel: 500, venda: 1200, categoria: "Traje Alemão", foto: "fotos/alemao.png.png" , desc:"Fantasia do Alemão Clássico clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 102, nome: "Alemão Luxo", tamanho: "M", aluguel: 500, venda: 1200, categoria: "Traje Alemão", foto: "fotos/trajealemao.png.png" , desc:"Fantasia do Alemão Luxo clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 103, nome: "Alemã Tradicional", tamanho: "M", aluguel: 500, venda: 1200, categoria: "Traje Alemão", foto: "fotos/alema.png.png" , desc:"Fantasia da Alemã Tradicional clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 104, nome: "Alemã Vermelha", tamanho: "M", aluguel: 500, venda: 1200, categoria: "Traje Alemão", foto: "fotos/alemavermelha.png.png" , desc:"Fantasia da Alemã Vermelha clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 105, nome: "Alemã Marrom", tamanho: "M", aluguel: 500, venda: 1200, categoria: "Traje Alemão", foto: "fotos/alemamarrom.png.png" , desc:"Fantasia da Alemã Marrom clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 106, nome: "Alemã Rosa", tamanho: "M", aluguel: 500, venda: 1200, categoria: "Traje Alemão", foto: "fotos/alemarosa.png.png" , desc:"Fantasia da Alemã Rosa clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 107, nome: "Alemã Vinho", tamanho: "M", aluguel: 500, venda: 1200, categoria: "Traje Alemão", foto: "fotos/alemavinho.png.png" , desc:"Fantasia da Alemã Vinho clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 108, nome: "Alemão Oktoberfest", tamanho: "M", aluguel: 500, venda: 1200, categoria: "Traje Alemão", foto: "fotos/trajealemao.png (2).png" , desc:"Fantasia do Alemão Oktoberfest clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 109, nome: "Coelho da Páscoa", tamanho: "G", aluguel: 500, venda: 1200, categoria: "Páscoa", foto: "fotos/pascoa.png.png" , desc:"Fantasia do Coelho da Páscoa clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 110, nome: "Tiara Romana", tamanho: "único", aluguel: 50, venda: 120, categoria: "Acessórios", foto:"fotos/tiara.png" , desc:"Fantasia da Tiara Romana clássica ideal para eventos temáticos e festas à fantasia." },
+            { id :111 , nome :"Tiara Romana/Grega" , tamanho :"único" , aluguel :50 , venda :120 , categoria :"Acessórios" , foto :"fotos/tiara.png" , desc :"Fantasia da tiara romana/grega clássica ideal para eventos temáticos e festas à fantasia." },
+            { id :112 , nome :"Tiara Romana/Grega" , tamanho :"único" , aluguel :500 , venda :1200 , categoria :"Acessórios" , foto :"fotos/acessoromano.png.png" , desc :"Fantasia da tiara romana/grega clássica ideal para eventos temáticos e festas à fantasia." },
+            { id :113 , nome :"Orelhas Elfo/Elfa" , tamanho :"único" , aluguel :500 , venda :1200 , categoria :"Acessórios" , foto :"fotos/elfoelfa.png.png" , desc :"Fantasia das orelhas elfo/elfa clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 114, nome: "Coroa de Princesa", tamanho: "único", aluguel: 500, venda: 1200, categoria: "Acessórios", foto: "fotos/coroaprincesa.png.png" , desc:"Fantasia da coroa de princesa clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 115, nome: "Cartola", tamanho: "único", aluguel: 500, venda: 1200, categoria:"Acessórios" , foto :"fotos/cartola.png.jpeg" , desc :"Fantasia da cartola clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 116, nome: "Chapéu Cowboy", tamanho: "único", aluguel: 500, venda: 1200, categoria: "Acessórios", foto: "fotos/cowboy.png.jpeg" , desc:"Fantasia do chapéu cowboy clássico ideal para eventos temáticos e festas à fantasia." },
+            { id: 117, nome: "Chapéu Xerife do Velho Oeste", tamanho: "único", aluguel: 500, venda: 1200, categoria: "Acessórios", foto: "fotos/xerife.png.jpeg" , desc:"Fantasia do chapéu xerife do velho oeste clássico ideal para eventos temáticos e festas à fantasia." },
+            { id: 118, nome: "Coroa de Louros", tamanho: "único", aluguel: 500, venda: 1200, categoria: "Acessórios", foto: "fotos/coroalouros.png.jpeg" , desc:"Fantasia da coroa de louros clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 119, nome: "Chifres de diaba", tamanho: "único", aluguel: 500, venda: 1200, categoria: "Acessórios", foto: "fotos/coroadiaba.png.png" , desc:"Fantasia dos chifres de diaba clássica ideal para eventos temáticos e festas à fantasia." },
+            { id: 120, nome: "Chapéu Bobo da Corte", tamanho: "único", aluguel: 500, venda: 1200, categoria: "Acessórios", foto: "fotos/bobodacorte.png.png" , desc:"Fantasia do chapéu bobo da corte clássico ideal para eventos temáticos e festas à fantasia." },
+            { id: 121, nome: "Tiara Egípcia", tamanho: "único", aluguel: 500, venda: 1200, categoria:"Acessórios" , foto :"fotos/tiaraegipcia.png.png" , desc :"Fantasia da tiara egípcia clássica ideal para eventos temáticos e festas à fantasia." }
+        ];
+
+        let carrinho = JSON.parse(localStorage.getItem('carrinho_terelepe')) || [];
+
+        function obterPrecos(item) {
+            return {
+                aluguel: item.aluguel || VALOR_PADRAO_ALUGUEL,
+                venda: item.venda || VALOR_PADRAO_VENDA
+            };
+        }
+
+        function renderizarSite(filtro = "Todas") {
+            const vitrine = document.getElementById('lista-fantasias');
+            vitrine.innerHTML = "";
+            const filtrados = filtro === "Todas" ? minhasFantasias : minhasFantasias.filter(f => f.categoria === filtro);
+            
+            filtrados.forEach(item => {
+                const p = obterPrecos(item);
+                vitrine.innerHTML += `
+                    <div class="card-fantasia rounded-[2.5rem] shadow-xl overflow-hidden border border-white flex flex-col hover:translate-y-[-10px] transition-all cursor-pointer" onclick="abrirModal(${item.id})">
+                        <img src="${item.foto}" class="w-full h-80 object-cover" onerror="this.src='https://placehold.co/400x600?text=Foto+em+Breve'">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-1">${item.nome}</h3>
+                            <p class="text-purple-500 font-bold mb-4 italic">${item.categoria} - Tam: ${item.tamanho}</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-gray-400">Ver mais →</span>
+                                <span class="bg-purple-100 px-3 py-1 rounded-full text-purple-600 font-bold text-lg">R$ ${p.aluguel}</span>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+            atualizarCarrinho();
+        }
+
+        function abrirModal(id) {
+            const item = minhasFantasias.find(f => f.id === id);
+            const p = obterPrecos(item);
+            const conteudo = document.getElementById('conteudo-modal');
+            conteudo.innerHTML = `
+                <div class="w-full md:w-1/2">
+                    <img src="${item.foto}" class="w-full h-[400px] object-cover rounded-3xl shadow-lg" onerror="this.src='https://placehold.co/400x600?text=Foto+em+Breve'">
+                </div>
+                <div class="w-full md:w-1/2 flex flex-col">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">${item.nome}</h2>
+                    <span class="text-purple-600 font-bold mb-4">${item.categoria} | Tamanho: ${item.tamanho}</span>
+                    <p class="text-gray-600 mb-6 flex-grow">Fantasia oficial Terelepe. Perfeita para festas temáticas e eventos. Material confortável e ajustável ao corpo.</p>
+                    <div class="grid grid-cols-1 gap-4">
+                        <button onclick="addCarrinho(${item.id}, 'Aluguel')" class="bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-2xl font-bold text-lg transition flex justify-between items-center">
+                            <span>ALUGAR</span><span>R$ ${p.aluguel}</span>
+                        </button>
+                        <button onclick="addCarrinho(${item.id}, 'Venda')" class="bg-pink-100 hover:bg-pink-200 text-pink-600 p-4 rounded-2xl font-bold text-lg transition flex justify-between items-center">
+                            <span>COMPRAR</span><span>R$ ${p.venda}</span>
+                        </button>
+                    </div>
+                </div>`;
+            document.getElementById('modal-detalhes').classList.remove('hidden');
+        }
+
+        // 1. PRIMEIRO AS CONFIGURAÇÕES (Não esqueça de colocar seu link e número aqui!)
+        const WHATSAPP_LOJA = "5511963267337"; // Substitua pelo seu celular com DDD
+        const LINK_MERCADO_PAGO = "link.mercadopago.com.br/terelepefantasias"; // Seu link de valor aberto
+
+        // 2. DEPOIS AS FUNÇÕES
+        function fecharModal() { 
+            document.getElementById('modal-detalhes').classList.add('hidden'); 
+        }
+
+        function addCarrinho(id, tipo) {
+            const f = minhasFantasias.find(i => i.id === id);
+            const p = obterPrecos(f);
+            carrinho.push({ ...f, tipoPedido: tipo, precoFinal: tipo === 'Aluguel' ? p.aluguel : p.venda });
+            localStorage.setItem('carrinho_terelepe', JSON.stringify(carrinho));
+            atualizarCarrinho();
+            fecharModal();
+            toggleCarrinho(true);
+        }
+
+        function atualizarCarrinho() {
+            const contagem = document.getElementById('contagem-carrinho');
+            const lista = document.getElementById('itens-carrinho');
+            const totalElemento = document.getElementById('total-carrinho');
+            
+            if(!contagem || !lista || !totalElemento) return;
+
+            contagem.innerText = carrinho.length;
+            let total = 0;
+            lista.innerHTML = "";
+            
+            carrinho.forEach((item, index) => {
+                total += item.precoFinal;
+                lista.innerHTML += `
+                <div class="flex items-center gap-4 bg-gray-50 p-3 rounded-xl border">
+                    <img src="${item.foto}" class="w-12 h-12 rounded-lg object-cover">
+                    <div class="flex-grow text-xs font-bold">${item.nome}<br><span class="text-purple-500">${item.tipoPedido} - R$ ${item.precoFinal}</span></div>
+                    <button onclick="remover(${index})" class="text-red-500 text-2xl">&times;</button>
+                </div>`;
+            });
+            totalElemento.innerText = `R$ ${total.toFixed(2)}`;
+        }
+
+        function remover(i) { 
+            carrinho.splice(i, 1); 
+            localStorage.setItem('carrinho_terelepe', JSON.stringify(carrinho)); 
+            atualizarCarrinho(); 
+        }
+
+        function toggleCarrinho(abrir = false) { 
+            const p = document.getElementById('painel-carrinho');
+            if (abrir === true) p.classList.remove('translate-x-full');
+            else p.classList.toggle('translate-x-full');
+        }
+
+        function filtrar(cat, btn) {
+            document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+            renderizarSite(cat);
+        }
+
+        // LÓGICA DE PAGAMENTO E WHATSAPP
+        function finalizarWhatsApp() {
+            if (carrinho.length === 0) return alert("Adicione itens ao carrinho!");
+            let total = 0;
+            let msg = "⭐ *PEDIDO SITE TERELEPE* ⭐\n\n";
+            carrinho.forEach(i => {
+                msg += `✅ *${i.nome}*\nTipo: ${i.tipoPedido}\nPreço: R$ ${i.precoFinal}\n\n`;
+                total += i.precoFinal;
+            });
+            msg += `💰 *TOTAL: R$ ${total.toFixed(2)}*\n\n_Quero confirmar a disponibilidade para a minha festa!_`;
+            window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        function finalizarMercadoPago() {
+            if (carrinho.length === 0) return alert("Seu carrinho está vazio!");
+            
+            let total = 0;
+            carrinho.forEach(i => total += i.precoFinal);
+
+            alert("O total do seu pedido é R$ " + total.toFixed(2) + ".\n\nInforme este valor na página do Mercado Pago para concluir.");
+            
+            window.location.href = MERCADO_PAGO_LIVRE;
+        }
+
+        // Inicializa o site
+        renderizarSite();
+    </script>
+</body>
+</html>
